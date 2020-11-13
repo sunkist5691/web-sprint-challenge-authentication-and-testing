@@ -3,6 +3,17 @@
   before granting access to the next middleware/route handler
 */
 
+const secretCode = require('./secret')
+const jwt = require('jsonwebtoken')
+
 module.exports = (req, res, next) => {
-  res.status(401).json({ you: 'shall not pass!' });
+  const token = req.header.authorization
+  if(!token){
+    return res.status(401).json({ message: 'Token is not exist' })
+  }
+  jwt.verify(token, secretCode, (error, decodedToken) => {
+    if(err) return res.status(401).json({ message: 'Not an authorized token' })
+    req.decodedToken = decodedToken
+    next()
+  })
 };
